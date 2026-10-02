@@ -22,14 +22,11 @@ jobs:
           cache: 'gradle'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-            package: platform-tools
+        uses: android-actions/setup-android@v4
 
       - name: Accept Android SDK licenses
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || \
-          yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+          yes | sdkmanager --licenses || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -42,40 +39,15 @@ jobs:
             :black-reflection:assemble \
             :compiler:assemble
 
-      - name: Upload APKs
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: APKs
+          name: android-build-artifacts
           path: |
-            app/build/outputs/apk/debug/*.apk
-            app/build/outputs/apk/release/*.apk
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload Bcore AARs
-        uses: actions/upload-artifact@v4
-        with:
-          name: Bcore-AARs
-          path: |
+            app/build/outputs/**/*.apk
             Bcore/build/outputs/aar/*.aar
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload black-reflection artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: black-reflection
-          path: |
             black-reflection/build/libs/*.jar
             black-reflection/build/outputs/**/*.aar
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload compiler artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiler
-          path: |
             compiler/build/libs/*.jar
             compiler/build/outputs/**/*.aar
           if-no-files-found: error
